@@ -63,7 +63,7 @@ static gint timer_new( gpointer user_data );
 static void timer_free( gint timer, gpointer user_data );
 static gint timer_timeout_callback( gpointer user_data );
 
-static gboolean on_window_key_press_event( GtkWindow *window, GdkEvent *event, gpointer user_data );
+static gboolean on_key_pressed( GtkEventControllerKey *self, guint keyval, guint keycode, GdkModifierType state, gpointer user_data );
 
 
 /*
@@ -123,7 +123,7 @@ label_new(
 	GtkStyleContext *style_context;
 	GtkLabel *label = GTK_LABEL( gtk_label_new( "0.0" ) );
 
-	gtk_label_set_line_wrap( label, FALSE );
+	gtk_label_set_wrap( label, FALSE );
 	gtk_label_set_width_chars( label, LABEL_MAXIMUM_WIDTH_CHARS );
 	gtk_label_set_max_width_chars( label, LABEL_MAXIMUM_WIDTH_CHARS );
 	gtk_label_set_single_line_mode( label, TRUE );
@@ -143,6 +143,7 @@ label_set_font_size(
 	GtkLabel *label,
 	gint font_size )
 {
+	const gchar *css_provider_fmt = "label { font-size: %dpx; }";
 	gchar *css_provider_data;
 	gint css_provider_data_len;
 	GtkCssProvider *css_provider;
@@ -152,10 +153,10 @@ label_set_font_size(
 
 	css_provider = GTK_CSS_PROVIDER( g_object_get_qdata( G_OBJECT( label ), label_css_provider_quark() ) );
 
-	css_provider_data_len = g_snprintf( NULL, 0, "label { font-size: %dpx }", font_size );
+	css_provider_data_len = g_snprintf( NULL, 0, css_provider_fmt, font_size );
 	css_provider_data = g_new( gchar, css_provider_data_len + 1 );
-	g_snprintf( css_provider_data, css_provider_data_len + 1, "label { font-size: %dpx }", font_size );
-	gtk_css_provider_load_from_data( css_provider, css_provider_data, css_provider_data_len, NULL );
+	g_snprintf( css_provider_data, css_provider_data_len + 1, css_provider_fmt, font_size );
+	gtk_css_provider_load_from_data( css_provider, css_provider_data, css_provider_data_len );
 	g_free( css_provider_data );
 }
 
@@ -266,16 +267,18 @@ timer_timeout_callback(
 	window
 */
 static gboolean
-on_window_key_press_event(
-	GtkWindow *window,
-	GdkEvent *event,
+on_key_pressed(
+	GtkEventControllerKey *self,
+	guint keyval,
+	guint keycode,
+	GdkModifierType state,
 	gpointer user_data )
 {
-	GdkEventKey *eventkey = (GdkEventKey*)event;
+	GtkWindow *window = GTK_WINDOW( user_data );
 
-	if( ( eventkey->state & GDK_CONTROL_MASK ) && eventkey->keyval == GDK_KEY_q )
+	if( keyval == GDK_KEY_q && state == GDK_CONTROL_MASK )
 	{
-		gtk_widget_destroy( GTK_WIDGET( window ) );
+		gtk_window_destroy( window );
 		return FALSE;
 	}
 
@@ -296,12 +299,15 @@ window_new(
 	GtkSpinButton *spin;
 	GtkLabel *label;
 	GtkButton *button;
+	GtkEventControllerKey *key;
 
 	/* create window */
-	window = GTK_WINDOW( gtk_window_new( GTK_WINDOW_TOPLEVEL ) );
+	window = GTK_WINDOW( gtk_application_window_new( app ) );
 	gtk_window_set_title( window, PROGRAM_NAME );
 	gtk_window_set_resizable( window, FALSE );
-	g_signal_connect( window, "key-press-event", G_CALLBACK( on_window_key_press_event ), NULL );
+	key = GTK_EVENT_CONTROLLER_KEY( gtk_event_controller_key_new() );
+	gtk_widget_add_controller( GTK_WIDGET( window ), GTK_EVENT_CONTROLLER( key ) );
+	g_signal_connect( G_OBJECT( key ), "key-pressed", G_CALLBACK( on_key_pressed ), window );
 
 	/* create widgets */
 	vbox = GTK_BOX( gtk_box_new( GTK_ORIENTATION_VERTICAL, 1 ) );
@@ -310,10 +316,10 @@ window_new(
 	button = button_new( window );
 
 	/* layout widgets */
-	gtk_container_add( GTK_CONTAINER( window ), GTK_WIDGET( vbox ) );
-	gtk_box_pack_start( vbox, GTK_WIDGET( spin ), FALSE, FALSE, 0 );
-	gtk_box_pack_start( vbox, GTK_WIDGET( label ), TRUE, TRUE, 0 );
-	gtk_box_pack_start( vbox, GTK_WIDGET( button ), FALSE, FALSE, 0 );
+	gtk_window_set_child( window, GTK_WIDGET( vbox ) );
+	gtk_box_append( vbox, GTK_WIDGET( spin ) );
+	gtk_box_append( vbox, GTK_WIDGET( label ) );
+	gtk_box_append( vbox, GTK_WIDGET( button ) );
 
 	/* collect private */
 	priv = window_private_new();

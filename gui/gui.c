@@ -11,8 +11,7 @@ on_app_activate(
 
 	g_return_if_fail( GTK_IS_WINDOW( window ) );
 
-	gtk_application_add_window( app, window );
-	gtk_widget_show_all( GTK_WIDGET( window ) );
+	gtk_widget_show( GTK_WIDGET( window ) );
 }
 
 int

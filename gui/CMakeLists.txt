@@ -1,7 +1,7 @@
 project( gui LANGUAGES C )
 
 find_package( PkgConfig REQUIRED )
-pkg_check_modules( GTK3 REQUIRED gtk+-3.0 )
+pkg_check_modules( GTK4 REQUIRED gtk4 )
 
 add_library( gui
 	STATIC
@@ -14,14 +14,14 @@ set_target_properties( gui PROPERTIES
 
 target_include_directories( gui
 	PRIVATE
-	${GTK3_INCLUDE_DIRS}
+	${GTK4_INCLUDE_DIRS}
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR} )
 
 target_link_directories( gui
 	PRIVATE
-	${GTK3_LIBRARY_DIRS} )
+	${GTK4_LIBRARY_DIRS} )
 
 target_link_libraries( gui
 	PRIVATE
-	${GTK3_LIBRARIES} )
+	${GTK4_LIBRARIES} )
