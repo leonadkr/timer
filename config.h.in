@@ -1,0 +1,8 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define PROGRAM_NAME "@PROGRAM_NAME@"
+#define APP_ID "gtk.time.timer"
+
+#endif
+
