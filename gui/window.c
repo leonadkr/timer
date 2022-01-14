@@ -276,7 +276,7 @@ on_key_pressed(
 {
 	GtkWindow *window = GTK_WINDOW( user_data );
 
-	if( keyval == GDK_KEY_q && state == GDK_CONTROL_MASK )
+	if( keyval == GDK_KEY_q && ( state & GDK_CONTROL_MASK ) )
 	{
 		gtk_window_destroy( window );
 		return FALSE;
