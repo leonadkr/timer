@@ -1,5 +1,6 @@
 Very simple timer. It just shows seconds and can be adjusted in the interval from 1 second to 1 hour.
 
+The program uses Gtk4 and you need cmake to build it.
 
 To build:
 cmake -S timer -B /tmp/timer/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_TOOLCHAIN_FILE=GlibToolChain.cmake
