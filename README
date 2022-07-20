@@ -1,21 +1,8 @@
-to configure 'Debug':
-	cmake -S . -B /path/to/debug/configure
-		-DCMAKE_BUILD_TYPE=Debug
-		-DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/file
-		-DCMAKE_INSTALL_PREFIX=/path/to/install
+Very simple timer. It just shows seconds and can be adjusted in the interval from 1 second to 1 hour.
 
-to configure 'Release':
-	cmake -S . -B /path/to/release/configure
-		-DCMAKE_BUILD_TYPE=Release
-		-DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain/file
-		-DCMAKE_INSTALL_PREFIX=/path/to/install
 
-to build 'Debug' and install:
-	cmake --build /path/to/configure --config=Debug
-		--prefix=/path/to/install
-		--target install
+To build:
+cmake -S timer -B /tmp/timer/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_TOOLCHAIN_FILE=GlibToolChain.cmake
 
-to build 'Release' and install:
-	cmake --build /path/to/configure --config=Release
-		--prefix=/path/to/install
-		--target install
+To install:
+cmake --build /tmp/timer/release --config Release --target install DESTDIR=$HOME/.local
